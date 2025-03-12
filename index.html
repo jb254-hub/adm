@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Union Centre Booking Centre</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fa;
+            color: #333;
+        }
+
+        header {
+            background-color: #28a745;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .container {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #28a745;
+            color: white;
+            font-weight: 500;
+        }
+
+        table tbody tr {
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        table td {
+            color: #555;
+        }
+
+        .message {
+            background-color: #e7f5e7;
+            color: #155724;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            header {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            table th,
+            table td {
+                padding: 10px;
+            }
+
+            table {
+                margin-top: 10px;
+                font-size: 0.9rem;
+            }
+
+            table td {
+                word-wrap: break-word;
+            }
+
+            table tbody tr {
+                display: block;
+                margin-bottom: 15px;
+                border: none;
+            }
+
+            table tbody tr td {
+                display: flex;
+                justify-content: space-between;
+                padding: 12px 10px;
+                border: 1px solid #ddd;
+            }
+
+            table tbody tr td:before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: #28a745;
+                margin-right: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Union Centre Booking Centre - Admin Panel</h1>
+    </header>
+
+    <div class="container">
+        <h2>Bookings</h2>
+
+        <div id="message" class="message" style="display: none;"></div>
+
+        <table id="bookings-table">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Name</th>
+                    <th>Contact Method</th>
+                    <th>Contact Info</th>
+                    <th>Service</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Bookings will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Fetch bookings and display in the table
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchBookings();
+        });
+
+        function fetchBookings() {
+            fetch('http://localhost:3000/admin/bookings')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        displayMessage(data.message, 'error');
+                    } else {
+                        populateBookingsTable(data);
+                    }
+                })
+                .catch(error => {
+                    displayMessage('Error fetching bookings: ' + error, 'error');
+                });
+        }
+
+        function populateBookingsTable(bookings) {
+            const tableBody = document.getElementById('bookings-table').querySelector('tbody');
+            tableBody.innerHTML = '';  // Clear the table body
+
+            bookings.forEach(booking => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${booking.id}</td>
+                    <td>${booking.name}</td>
+                    <td>${booking.contact_method}</td>
+                    <td>${booking.contact_info}</td>
+                    <td>${booking.service}</td>
+                    <td>${booking.details}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function displayMessage(message, type) {
+            const messageElement = document.getElementById('message');
+            messageElement.style.display = 'block';
+            messageElement.textContent = message;
+            if (type === 'error') {
+                messageElement.classList.add('error');
+            } else {
+                messageElement.classList.remove('error');
+            }
+        }
+    </script>
+
+</body>
+</html>
